@@ -1,5 +1,8 @@
 {
   "expo": {
+    "android": {
+      "softwareKeyboardLayoutMode": "pan"
+     },
     "scheme": "acme",
     "userInterfaceStyle": "automatic",
     "orientation": "default",
