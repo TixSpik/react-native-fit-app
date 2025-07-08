@@ -1,6 +1,7 @@
 import { useSignIn } from "@clerk/clerk-expo";
-import { Link, useRouter } from "expo-router";
+import { Link, useFocusEffect, useRouter } from "expo-router";
 import {
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Text,
@@ -19,6 +20,30 @@ export default function Page() {
 
   const [emailAddress, setEmailAddress] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [extraPadding, setExtraPadding] = useState(0)
+
+    useFocusEffect(
+    React.useCallback(() => {
+      const keyboardDidShowListener = Keyboard.addListener(
+        'keyboardDidShow',
+        () => {   
+          setExtraPadding(80);
+        }
+      );
+
+      const keyboardDidHideListener = Keyboard.addListener(
+        'keyboardDidHide',
+         () => {
+           setExtraPadding(0);
+        }
+      );
+
+      return () => {
+        keyboardDidShowListener.remove();
+        keyboardDidHideListener.remove();
+      };
+    }, []) 
+  );
 
   // Handle the submission of the sign-in form
   const onSignInPress = async () => {
@@ -90,7 +115,7 @@ export default function Page() {
               </View>
             </View>
 
-            <View className="mb-6">
+            <View style={{ paddingBottom: extraPadding }} className="mb-6">
               <Text className="text-sm font-medium text-gray-700 mb-2">
                 Password
               </Text>
