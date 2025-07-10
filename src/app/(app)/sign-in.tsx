@@ -1,6 +1,7 @@
 import { useSignIn } from "@clerk/clerk-expo";
 import { Link, useRouter } from "expo-router";
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   Text,
@@ -11,6 +12,7 @@ import {
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import GoogleSignIn from "../componets/GoogleSignIn";
 
 export default function Page() {
   const { signIn, setActive, isLoaded } = useSignIn();
@@ -23,7 +25,12 @@ export default function Page() {
   // Handle the submission of the sign-in form
   const onSignInPress = async () => {
     if (!isLoaded) return;
+    if (!emailAddress || !password) {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
 
+    setIsLoading(true);
     // Start the sign-in process using the email and password provided
     try {
       const signInAttempt = await signIn.create({
@@ -45,6 +52,8 @@ export default function Page() {
       // See https://clerk.com/docs/custom-flows/error-handling
       // for more info on error handling
       console.error(JSON.stringify(err, null, 2));
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -111,34 +120,48 @@ export default function Page() {
                 />
               </View>
             </View>
-          </View>
 
-          <TouchableOpacity
-            onPress={onSignInPress}
-            disabled={isLoading}
-            className={`rounded-xl py-4 shadow-sm mb-4 ${
-              !isLoading ? "bg-blue-600" : "bg-gray-400"
-            } `}
-            activeOpacity={0.8}
-          >
-            <View className="flex-row items-center justify-center">
-              {isLoading ? (
-                <Ionicons name="refresh" size={20} color="white" />
-              ) : (
-                <Ionicons name="log-in-outline" size={20} color="white" />
-              )}
-              <Text className="text-white font-semibold text-lg ml-2">
-                {isLoading ? "Sign In..." : "Sign In"}
-              </Text>
+            <TouchableOpacity
+              onPress={onSignInPress}
+              disabled={isLoading}
+              className={`rounded-xl py-4 shadow-sm mb-4 ${
+                !isLoading ? "bg-blue-600" : "bg-gray-400"
+              } `}
+              activeOpacity={0.8}
+            >
+              <View className="flex-row items-center justify-center">
+                {isLoading ? (
+                  <Ionicons name="refresh" size={20} color="white" />
+                ) : (
+                  <Ionicons name="log-in-outline" size={20} color="white" />
+                )}
+                <Text className="text-white font-semibold text-lg ml-2">
+                  {isLoading ? "Sign In..." : "Sign In"}
+                </Text>
+              </View>
+            </TouchableOpacity>
+
+            <View className="flex-row items-center my-4">
+              <View className="flex-1 h-px bg-gray-200" />
+              <Text className="px-4 text-gray-500 text-sm">Or</Text>
+              <View className="flex-1 h-px bg-gray-200" />
             </View>
-          </TouchableOpacity>
-
-          <View style={{ display: "flex", flexDirection: "row", gap: 3 }}>
-            <Text>Don't have an account?</Text>
-            <Link href="/sign-up">
-              <Text>Sign up</Text>
+            <GoogleSignIn />
+          </View>
+          <View className="flex-row justify-center items-center mt-4">
+            <Text className="text-gray-600">Don't have an account?</Text>
+            <Link href="/sign-up" asChild>
+              <TouchableOpacity>
+                <Text className="text-blue-600 font-semibold">Sign Up</Text>
+              </TouchableOpacity>
             </Link>
           </View>
+        </View>
+
+        <View className="pb-6">
+          <Text className="text-center text-gray-500 text-sm">
+            Start your fitness journey today
+          </Text>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
